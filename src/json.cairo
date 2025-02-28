@@ -49,6 +49,7 @@ impl AttributeImpl of AttributeTrait<Attribute> {
 trait Builder<T> {
     fn new() -> T;
     fn add(self: T, key: ByteArray, value: ByteArray) -> T;
+    fn add_if_not_null(self: T, key: ByteArray, value: ByteArray) -> T;
     fn add_array(self: T, key: ByteArray, value: Span<ByteArray>) -> T;
     fn build(self: T) -> ByteArray;
 }
@@ -61,6 +62,13 @@ pub impl JsonImpl of Builder<JsonBuilder> {
 
     fn add(mut self: JsonBuilder, key: ByteArray, value: ByteArray) -> JsonBuilder {
         self.data.append(Attribute { key, value });
+        self
+    }
+
+    fn add_if_not_null(mut self: JsonBuilder, key: ByteArray, value: ByteArray) -> JsonBuilder {
+        if value.len() > 0 {
+            self.data.append(Attribute { key, value });
+        }
         self
     }
 
@@ -133,6 +141,23 @@ mod tests {
         );
 
         println!("json: {}", data);
+    }
+
+    #[test]
+    fn test_add_if_not_null() {
+        let data_null = JsonImpl::new()
+            .add_if_not_null("attr1", "")
+            .build();
+        assert_eq!(data_null.len(), 2);
+        let data_full = JsonImpl::new()
+            .add_if_not_null("attr1", "1234")
+            .add_if_not_null("attr2", "1234")
+            .build();
+        let data_half = JsonImpl::new()
+            .add_if_not_null("attr1", "1234")
+            .add_if_not_null("attr2", "")
+            .build();
+        assert_eq!(data_full.len(), data_half.len() * 2 - 1);
     }
 
     #[test]
