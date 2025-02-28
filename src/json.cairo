@@ -51,6 +51,7 @@ trait Builder<T> {
     fn add(self: T, key: ByteArray, value: ByteArray) -> T;
     fn add_if_not_null(self: T, key: ByteArray, value: ByteArray) -> T;
     fn add_array(self: T, key: ByteArray, value: Span<ByteArray>) -> T;
+    fn add_array_if_not_empty(self: T, key: ByteArray, value: Span<ByteArray>) -> T;
     fn build(self: T) -> ByteArray;
 }
 
@@ -70,6 +71,14 @@ pub impl JsonImpl of Builder<JsonBuilder> {
             self.data.append(Attribute { key, value });
         }
         self
+    }
+
+    fn add_array_if_not_empty(mut self: JsonBuilder, key: ByteArray, mut value: Span<ByteArray>) -> JsonBuilder {
+        if value.len() > 0 {
+            self.add_array(key, value)
+        } else {
+            self
+        }
     }
 
     fn add_array(mut self: JsonBuilder, key: ByteArray, mut value: Span<ByteArray>) -> JsonBuilder {
@@ -182,5 +191,17 @@ mod tests {
         );
 
         println!("\n\njson: {}\n\n", z);
+    }
+
+    #[test]
+    fn test_add_array_if_not_empty() {
+        let data_empty = JsonImpl::new()
+            .add_array_if_not_empty("array", array![].span())
+            .build();
+        let data_full = JsonImpl::new()
+            .add_array_if_not_empty("array", array!["attr1", "value1"].span())
+            .build();
+        assert_eq!(data_empty.len(), 2);
+        assert_gt!(data_full.len(), data_empty.len());
     }
 }
