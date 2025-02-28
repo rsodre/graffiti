@@ -17,9 +17,9 @@ impl JsonBuilderDefault of Default<JsonBuilder> {
 
 
 #[derive(Drop)]
-struct Attribute {
-    key: ByteArray,
-    value: ByteArray
+pub struct Attribute {
+    pub key: ByteArray,
+    pub value: ByteArray
 }
 
 trait AttributeTrait<Attribute> {
@@ -54,7 +54,7 @@ trait Builder<T> {
 }
 
 
-impl JsonImpl of Builder<JsonBuilder> {
+pub impl JsonImpl of Builder<JsonBuilder> {
     fn new() -> JsonBuilder {
         JsonBuilder { data: array![] }
     }

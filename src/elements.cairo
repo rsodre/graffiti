@@ -3,9 +3,9 @@
 //
 
 #[derive(Drop)]
-struct Attribute {
-    name: ByteArray,
-    value: ByteArray
+pub struct Attribute {
+    pub name: ByteArray,
+    pub value: ByteArray
 }
 
 impl AttributeClone of Clone<Attribute> {
@@ -41,14 +41,14 @@ impl AttributeArrayToBytes of super::ToBytes<Array<Attribute>> {
 //
 
 #[derive(Drop)]
-struct Tag {
+pub struct Tag {
     name: ByteArray,
     attrs: Option<Array<Attribute>>,
     children: Option<Array<Tag>>,
     content: Option<ByteArray>
 }
 
-impl TagClone of Clone<Tag> {
+pub impl TagClone of Clone<Tag> {
     fn clone(self: @Tag) -> Tag {
         let attrs = match self.attrs {
             Option::Some(attrs) => Option::Some(attrs.clone()),
@@ -94,7 +94,7 @@ impl TagArrayToBytes of super::ToBytes<Array<Tag>> {
 // TagBuilder trait
 //
 
-trait TagBuilder<T> {
+pub trait TagBuilder<T> {
     fn new(name: ByteArray) -> T;
     fn build(self: T) -> ByteArray;
     fn attr(self: T, name: ByteArray, value: ByteArray) -> T;

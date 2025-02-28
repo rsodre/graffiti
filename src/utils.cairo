@@ -1,25 +1,25 @@
-mod constants {
-    const BRACKET_OPEN: felt252 = '{';
-    const BRACKET_CLOSE: felt252 = '}';
+pub mod constants {
+    pub const BRACKET_OPEN: felt252 = '{';
+    pub const BRACKET_CLOSE: felt252 = '}';
 
-    const QUOTE: felt252 = '"';
-    const COLON: felt252 = ':';
-    const COMMA: felt252 = ',';
+    pub const QUOTE: felt252 = '"';
+    pub const COLON: felt252 = ':';
+    pub const COMMA: felt252 = ',';
 
-    const NAME: felt252 = 'name';
-    const DESCRIPTION: felt252 = 'description';
-    const IMAGE: felt252 = 'image';
-    const ATTRIBUTES: felt252 = 'attributes';
+    pub const NAME: felt252 = 'name';
+    pub const DESCRIPTION: felt252 = 'description';
+    pub const IMAGE: felt252 = 'image';
+    pub const ATTRIBUTES: felt252 = 'attributes';
 
-    const TRAIT_TYPE: felt252 = 'trait_type';
-    const VALUE: felt252 = 'value';
+    pub const TRAIT_TYPE: felt252 = 'trait_type';
+    pub const VALUE: felt252 = 'value';
 
-    const SQUARE_BRACKET_OPEN: felt252 = '[';
-    const SQUARE_BRACKET_CLOSE: felt252 = ']';
+    pub const SQUARE_BRACKET_OPEN: felt252 = '[';
+    pub const SQUARE_BRACKET_CLOSE: felt252 = ']';
 }
 
 // Check if a string starts with a bracket (either square or curly)
-fn starts_with_bracket(str: @ByteArray) -> bool {
+pub fn starts_with_bracket(str: @ByteArray) -> bool {
     if str.len() == 0 {
         return false;
     }

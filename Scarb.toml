@@ -6,5 +6,10 @@ description = "A Cairo library for building XML-based markup documents."
 keywords = ["cairo", "svg", "html", "xml", "markup"]
 repository = "https://github.com/milancermak/graffiti"
 license-file = "LICENSE"
+edition = "2024_07"
+
+[dev-dependencies]
+starknet = "2.9.2"
+cairo_test = "2.9.2"
 
 [lib]
