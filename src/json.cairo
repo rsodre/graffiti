@@ -5,8 +5,8 @@ use graffiti::utils::starts_with_bracket;
 
 
 #[derive(Drop)]
-struct JsonBuilder {
-    data: Array<Attribute>
+pub struct JsonBuilder {
+    pub data: Array<Attribute>
 }
 
 impl JsonBuilderDefault of Default<JsonBuilder> {
@@ -49,8 +49,10 @@ impl AttributeImpl of AttributeTrait<Attribute> {
 trait Builder<T> {
     fn new() -> T;
     fn add(self: T, key: ByteArray, value: ByteArray) -> T;
+    fn add_if_some(self: T, key: ByteArray, value: Option<ByteArray>) -> T;
     fn add_if_not_null(self: T, key: ByteArray, value: ByteArray) -> T;
     fn add_array(self: T, key: ByteArray, value: Span<ByteArray>) -> T;
+    fn add_array_if_some(self: T, key: ByteArray, value: Option<Span<ByteArray>>) -> T;
     fn add_array_if_not_empty(self: T, key: ByteArray, value: Span<ByteArray>) -> T;
     fn build(self: T) -> ByteArray;
 }
@@ -66,11 +68,32 @@ pub impl JsonImpl of Builder<JsonBuilder> {
         self
     }
 
+    fn add_if_some(mut self: JsonBuilder, key: ByteArray, value: Option<ByteArray>) -> JsonBuilder {
+        match value {
+            Option::Some(v) => {
+                self.data.append(Attribute { key, value: v });
+            },
+            Option::None => {}
+        };
+        self
+    }
+
     fn add_if_not_null(mut self: JsonBuilder, key: ByteArray, value: ByteArray) -> JsonBuilder {
         if value.len() > 0 {
             self.data.append(Attribute { key, value });
         }
         self
+    }
+
+    fn add_array_if_some(mut self: JsonBuilder, key: ByteArray, mut value: Option<Span<ByteArray>>) -> JsonBuilder {
+        match value {
+            Option::Some(v) => {
+                self.add_array(key, v)
+            },
+            Option::None => {
+                self
+            }
+        }
     }
 
     fn add_array_if_not_empty(mut self: JsonBuilder, key: ByteArray, mut value: Span<ByteArray>) -> JsonBuilder {
@@ -153,6 +176,23 @@ mod tests {
     }
 
     #[test]
+    fn test_add_if_some() {
+        let data_null = JsonImpl::new()
+            .add_if_some("attr1", Option::None)
+            .build();
+        assert_eq!(data_null.len(), 2);
+        let data_full = JsonImpl::new()
+            .add_if_some("attr1", Option::Some("1234"))
+            .add_if_some("attr2", Option::Some("1234"))
+            .build();
+        let data_half = JsonImpl::new()
+            .add_if_some("attr1", Option::Some("1234"))
+            .add_if_some("attr2", Option::None)
+            .build();
+        assert_eq!(data_full.len(), data_half.len() * 2 - 1);
+    }
+
+    #[test]
     fn test_add_if_not_null() {
         let data_null = JsonImpl::new()
             .add_if_not_null("attr1", "")
@@ -191,6 +231,18 @@ mod tests {
         );
 
         println!("\n\njson: {}\n\n", z);
+    }
+
+    #[test]
+    fn test_add_array_if_some() {
+        let data_empty = JsonImpl::new()
+            .add_array_if_some("array", Option::None)
+            .build();
+        let data_full = JsonImpl::new()
+            .add_array_if_some("array", Option::Some(array!["attr1", "value1"].span()))
+            .build();
+        assert_eq!(data_empty.len(), 2);
+        assert_gt!(data_full.len(), data_empty.len());
     }
 
     #[test]
