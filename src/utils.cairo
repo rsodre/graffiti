@@ -5,6 +5,12 @@ pub mod constants {
     pub const QUOTE: felt252 = '"';
     pub const COLON: felt252 = ':';
     pub const COMMA: felt252 = ',';
+    pub const SLASH: felt252 = '/';
+    pub const QUESTION_MARK: felt252 = '?';
+    pub const AMPERSAND: felt252 = '&';
+    pub const EQUALS: felt252 = '=';
+    pub const PERCENT: felt252 = '%';
+    pub const ZERO: felt252 = '0';
 
     pub const NAME: felt252 = 'name';
     pub const DESCRIPTION: felt252 = 'description';
